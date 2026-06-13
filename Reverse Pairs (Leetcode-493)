@@ -1,0 +1,68 @@
+import java.util.ArrayList;
+
+class Solution {
+    private static void merge(int[] arr, int low, int mid, int high) {
+        // Using a primitive array instead of ArrayList for better performance
+        int[] temp = new int[high - low + 1]; 
+        int left = low;      // starting index of left half
+        int right = mid + 1;   // starting index of right half
+        int index = 0;
+
+        // Storing elements in the temporary array in a sorted manner
+        while (left <= mid && right <= high) {
+            if (arr[left] <= arr[right]) {
+                temp[index++] = arr[left++];
+            } else {
+                temp[index++] = arr[right++];
+            }
+        }
+
+        // If elements on the left half are still left
+        while (left <= mid) {
+            temp[index++] = arr[left++];
+        }
+
+        // If elements on the right half are still left
+        while (right <= high) {
+            temp[index++] = arr[right++];
+        }
+
+        // Transferring all elements from temporary array back to original arr
+        for (int i = low; i <= high; i++) {
+            arr[i] = temp[i - low];
+        }
+    }
+
+    public static int countPairs(int[] arr, int low, int mid, int high) {
+        int right = mid + 1;
+        int cnt = 0;
+        
+        for (int i = low; i <= mid; i++) {
+            // CRITICAL FIX: Cast to (long) to prevent integer overflow
+            while (right <= high && arr[i] > 2 * (long) arr[right]) {
+                right++;
+            }
+            cnt += (right - (mid + 1));
+        }
+        return cnt;
+    }
+
+    public static int mergeSort(int[] arr, int low, int high) {
+        int cnt = 0;
+        if (low >= high) return cnt;
+        
+        int mid = low + (high - low) / 2; // Prevent potential overflow in mid calculation
+        
+        cnt += mergeSort(arr, low, mid);       // Left half
+        cnt += mergeSort(arr, mid + 1, high);  // Right half
+        cnt += countPairs(arr, low, mid, high); // Count reverse pairs
+        merge(arr, low, mid, high);            // Merge sorted halves
+        
+        return cnt;
+    }
+
+    public int reversePairs(int[] nums) {
+        if (nums == null || nums.length < 2) return 0;
+        return mergeSort(nums, 0, nums.length - 1);
+    }
+}
