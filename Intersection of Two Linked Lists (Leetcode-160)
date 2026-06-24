@@ -14,3 +14,51 @@ public class Solution
         return a;
     }
 }
+
+
+
+
+****** Optimal Approach ******
+public class Solution 
+{
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) 
+    {
+        ListNode temp1 = headA;
+        ListNode temp2 = headB;
+        int N1 = 0;
+        int N2 = 0;
+        while(temp1 != null)
+        {
+            N1++;
+            temp1 = temp1.next;
+        }
+        while(temp2 != null)
+        {
+            N2++;
+            temp2 = temp2.next;
+        }
+        if(N1 < N2)
+        {
+            while(N1 != N2)
+            {
+                headB = headB.next;
+                N2--;
+            }
+        }
+        else
+        {
+            while(N1 != N2)
+            {
+                headA = headA.next;
+                N1--;
+            }
+        }
+
+        while(headA != headB )
+        {
+            headA = headA.next;
+            headB = headB.next;
+        }
+        return headA;
+    }
+}
