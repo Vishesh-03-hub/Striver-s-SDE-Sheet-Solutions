@@ -1,1 +1,64 @@
+class Solution {
 
+    // Helper method to find the K-th node from the current node
+    public ListNode findKNode(ListNode temp, int K) {
+        K -= 1;
+        while(temp != null && K > 0) {
+            K--;
+            temp = temp.next;
+        }
+        return temp;
+    }
+
+    // Helper method to reverse a single linked list segment
+    private ListNode reverse(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+        while (curr != null) {
+            ListNode next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+
+    public ListNode reverseKGroup(ListNode head, int k) {
+        ListNode temp = head;
+        ListNode nextNode = null;
+        ListNode prevNode = null;
+        ListNode KthNode = null;
+
+        while(temp != null) {
+            KthNode = findKNode(temp, k);
+            
+            // If there are fewer than k nodes left, leave them as they are
+            if(KthNode == null) {
+                if(prevNode != null) {
+                    prevNode.next = temp;
+                }
+                break;
+            }
+
+            // Save the starting node of the next group
+            nextNode = KthNode.next;
+            // Disconnect the current group to reverse it safely
+            KthNode.next = null;
+
+            // Reverse the current group of k nodes
+            reverse(temp);
+
+            // If it's the very first group, update the main head pointer
+            if(temp == head) {
+                head = KthNode;
+            } else {
+                prevNode.next = KthNode;
+            }
+
+            // Update pointers for the next iteration (Moved outside the else block)
+            prevNode = temp;
+            temp = nextNode;
+        }
+        return head;        
+    }
+}
