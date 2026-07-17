@@ -1,1 +1,71 @@
+import java.util.Arrays;
 
+class Solution {
+    public int[] gcdValues(int[] nums, long[] queries) {
+        // Find the maximum value in nums to size our lookup arrays appropriately
+        int maxVal = 0;
+        for (int num : nums) {
+            if (num > maxVal) {
+                maxVal = num;
+            }
+        }
+        
+        // Step 1: Count frequency of each number
+        long[] freq = new long[maxVal + 1];
+        for (int num : nums) {
+            freq[num]++;
+        }
+        
+        // Step 2: Count how many elements are multiples of each number i
+        long[] count = new long[maxVal + 1];
+        for (int i = 1; i <= maxVal; i++) {
+            for (int j = i; j <= maxVal; j += i) {
+                count[i] += freq[j];
+            }
+        }
+        
+        // Step 3: Compute the exact number of pairs with a GCD equal to i
+        long[] exactGcd = new long[maxVal + 1];
+        for (int i = maxVal; i >= 1; i--) {
+            long totalPairs = (count[i] * (count[i] - 1)) / 2;
+            
+            // Subtract pairs that have a GCD that is a strict multiple of i
+            for (int j = 2 * i; j <= maxVal; j += i) {
+                totalPairs -= exactGcd[j];
+            }
+            exactGcd[i] = totalPairs;
+        }
+        
+        // Step 4: Create a cumulative prefix sum of the pair counts
+        long[] pref = new long[maxVal + 1];
+        for (int i = 1; i <= maxVal; i++) {
+            pref[i] = pref[i - 1] + exactGcd[i];
+        }
+        
+        // Step 5: Answer each query using binary search (upper bound)
+        int[] ans = new int[queries.length];
+        for (int i = 0; i < queries.length; i++) {
+            ans[i] = upperBound(pref, queries[i]);
+        }
+        
+        return ans;
+    }
+    
+    // Custom binary search to find the first index where pref[index] > target
+    private int upperBound(long[] pref, long target) {
+        int low = 1;
+        int high = pref.length - 1;
+        int ans = high;
+        
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (pref[mid] > target) {
+                ans = mid; // This mid is a valid candidate, look left for a smaller one
+                high = mid - 1;
+            } else {
+                low = mid + 1; // target is greater or equal, look right
+            }
+        }
+        return ans;
+    }
+}
