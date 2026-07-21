@@ -1,0 +1,20 @@
+class Solution 
+{
+    public boolean isValid(String s) 
+    {
+        char[] ch = new char[s.length()];
+        int ind = 0;
+        for(char c : s.toCharArray())
+        {
+            if(c == '(')
+            ch[ind++] = ')';
+            else if(c == '{')
+            ch[ind++] = '}';
+            else if(c == '[')
+            ch[ind++] = ']';
+            else if(ind == 0 || ch[--ind] != c)
+            return false; 
+        }
+        return ind == 0;        
+    }
+}
