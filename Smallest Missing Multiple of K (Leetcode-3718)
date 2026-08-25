@@ -8,14 +8,12 @@ class Solution
         {
             contains[ele] = true;
         }
-
         int ans = k;
 
         while (contains[ans]) 
         {
             ans += k;
         }
-
         return ans;
     }
 }
